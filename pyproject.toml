@@ -1,0 +1,17 @@
+[project]
+name = "csvcheck"
+version = "0.1.0"
+description = "Check a CSV file against a small TOML schema"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+csvcheck = "csvcheck.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["csvcheck"]
