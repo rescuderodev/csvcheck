@@ -33,3 +33,9 @@ def test_bad_types():
 def test_empty_required():
     problems = run("id,nombre,precio,fecha_alta\n1,,3,\n")
     assert [(p.row, p.column) for p in problems] == [(2, "nombre")]
+
+
+def test_allowed_and_regex():
+    schema = {"columns": {"cat": {"allowed": ["libros", "musica"]}, "cp": {"regex": "[0-9]{5}"}}}
+    problems = run("cat,cp\nlibros,28002\ncine,2800\n", schema)
+    assert [(p.row, p.column) for p in problems] == [(3, "cat"), (3, "cp")]

@@ -1,4 +1,5 @@
 import csv
+import re
 from dataclasses import dataclass
 from datetime import date
 
@@ -61,4 +62,9 @@ def check(fh, schema):
             t = rules.get("type", "str")
             if not TYPES[t](value):
                 problems.append(Problem(i, name, f"not a valid {t}: {value!r}"))
+                continue
+            if "allowed" in rules and value not in rules["allowed"]:
+                problems.append(Problem(i, name, f"{value!r} not in {rules['allowed']}"))
+            if "regex" in rules and not re.fullmatch(rules["regex"], value):
+                problems.append(Problem(i, name, f"{value!r} does not match {rules['regex']}"))
     return problems
