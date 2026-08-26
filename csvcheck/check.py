@@ -14,7 +14,7 @@ def _is_int(v):
 
 def _is_float(v):
     try:
-        float(v)
+        float(v.replace(",", "."))  # excel en español usa coma decimal
         return True
     except ValueError:
         return False
@@ -41,10 +41,20 @@ class Problem:
         return f"row {self.row}, {self.column}: {self.message}"
 
 
+def sniff_delimiter(sample):
+    """Excel saves CSV with ; when the system is in spanish."""
+    try:
+        return csv.Sniffer().sniff(sample, delimiters=",;\t").delimiter
+    except csv.Error:
+        return ","
+
+
 def check(fh, schema):
     """Returns the list of problems found in the CSV."""
     columns = schema.get("columns", {})
-    reader = csv.DictReader(fh)
+    sample = fh.read(4096)
+    fh.seek(0)
+    reader = csv.DictReader(fh, delimiter=sniff_delimiter(sample))
     problems = []
     header = reader.fieldnames or []
     for name, rules in columns.items():

@@ -39,3 +39,7 @@ def test_allowed_and_regex():
     schema = {"columns": {"cat": {"allowed": ["libros", "musica"]}, "cp": {"regex": "[0-9]{5}"}}}
     problems = run("cat,cp\nlibros,28002\ncine,2800\n", schema)
     assert [(p.row, p.column) for p in problems] == [(3, "cat"), (3, "cp")]
+
+
+def test_semicolon_and_decimal_comma():
+    assert run("id;nombre;precio;fecha_alta\n1;uno;9,5;2026-08-01\n") == []
