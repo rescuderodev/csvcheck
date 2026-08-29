@@ -13,7 +13,8 @@ SCHEMA = {
 
 
 def run(text, schema=SCHEMA):
-    return check(io.StringIO(text), schema)
+    problems, _ = check(io.StringIO(text), schema)
+    return problems
 
 
 def test_ok():
@@ -43,3 +44,14 @@ def test_allowed_and_regex():
 
 def test_semicolon_and_decimal_comma():
     assert run("id;nombre;precio;fecha_alta\n1;uno;9,5;2026-08-01\n") == []
+
+
+def test_unique():
+    schema = {"columns": {"id": {"type": "int", "unique": True}}}
+    problems = run("id\n1\n2\n1\n", schema)
+    assert len(problems) == 1 and "row 2" in problems[0].message
+
+
+def test_row_count():
+    _, rows = check(io.StringIO("id,nombre,precio\n1,a,1\n2,b,2\n"), SCHEMA)
+    assert rows == 2

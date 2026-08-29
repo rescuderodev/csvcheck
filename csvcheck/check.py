@@ -50,7 +50,7 @@ def sniff_delimiter(sample):
 
 
 def check(fh, schema):
-    """Returns the list of problems found in the CSV."""
+    """Returns (problems, number of data rows)."""
     columns = schema.get("columns", {})
     sample = fh.read(4096)
     fh.seek(0)
@@ -60,7 +60,10 @@ def check(fh, schema):
     for name, rules in columns.items():
         if name not in header and rules.get("required", True):
             problems.append(Problem(1, name, "missing column"))
+    seen = {name: {} for name, rules in columns.items() if rules.get("unique")}
+    rows = 0
     for i, row in enumerate(reader, start=2):
+        rows += 1
         for name, rules in columns.items():
             if name not in row:
                 continue
@@ -77,4 +80,9 @@ def check(fh, schema):
                 problems.append(Problem(i, name, f"{value!r} not in {rules['allowed']}"))
             if "regex" in rules and not re.fullmatch(rules["regex"], value):
                 problems.append(Problem(i, name, f"{value!r} does not match {rules['regex']}"))
-    return problems
+            if name in seen:
+                if value in seen[name]:
+                    problems.append(Problem(i, name, f"duplicated, first seen in row {seen[name][value]}"))
+                else:
+                    seen[name][value] = i
+    return problems, rows
