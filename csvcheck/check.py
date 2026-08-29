@@ -63,6 +63,8 @@ def check(fh, schema):
     seen = {name: {} for name, rules in columns.items() if rules.get("unique")}
     rows = 0
     for i, row in enumerate(reader, start=2):
+        if not any((v or "").strip() for v in row.values() if isinstance(v, str)):
+            continue  # empty lines, excel leaves some at the end
         rows += 1
         for name, rules in columns.items():
             if name not in row:

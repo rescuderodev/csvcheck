@@ -55,3 +55,8 @@ def test_unique():
 def test_row_count():
     _, rows = check(io.StringIO("id,nombre,precio\n1,a,1\n2,b,2\n"), SCHEMA)
     assert rows == 2
+
+
+def test_empty_lines_at_the_end():
+    _, rows = check(io.StringIO("id,nombre,precio\n1,a,1\n,,\n\n"), SCHEMA)
+    assert rows == 1
