@@ -1,0 +1,17 @@
+# columnas de examples/productos.csv
+[columns.id]
+type = "int"
+unique = true
+
+[columns.nombre]
+type = "str"
+
+[columns.precio]
+type = "float"
+
+[columns.categoria]
+allowed = ["libros", "musica", "cine"]
+
+[columns.fecha_alta]
+type = "date"
+required = false
